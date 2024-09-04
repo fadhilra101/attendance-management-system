@@ -14,7 +14,7 @@ new #[Layout('layouts.guest')] class extends Component
     public string $email = '';
     public string $password = '';
     public string $password_confirmation = '';
-    public string $role_id = null; // Menambahkan role_id
+    public string $role_id = ""; // Menambahkan role_id
 
     /**
      * Handle an incoming registration request.
