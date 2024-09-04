@@ -35,6 +35,20 @@ new class extends Component {
         $this->isEditing = true;
     }
 
+    public function verify($id): void
+    {
+        // Pastikan pengguna memiliki izin saat komponen dimuat
+        if (!Auth::user()->hasPermission('Edit Users')) {
+            abort(403, 'Unauthorized');
+        }
+
+        User::find($id)->update([
+            'verified_at' => now()
+        ]);
+
+        $this->dispatch('saved');
+    }
+
     public function deleteUser(): void
     {
         User::find($this->userId)->delete();
@@ -106,7 +120,14 @@ $userCanDelete = Auth::user()->hasPermission('Delete Users');
                                     @if($userCanEdit || $userCanDelete)
                                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                             @if($userCanEdit && $user->id !== Auth::user()->id)
+                                            <x-primary-button
+                                                :disabled="!is_null($user->verified_at)"
+                                                wire:click="$dispatch('open-modal', { name: 'confirm-verify', userId: {{ $user->id }} })">
+                                                {{ __('Verify') }}
+                                            </x-primary-button>
+
                                                 <x-secondary-button
+                                                    class="ms-2"
                                                     wire:click="edit({{ $user->id }})">
                                                     {{ __('Edit') }}
                                                 </x-secondary-button>
@@ -130,6 +151,27 @@ $userCanDelete = Auth::user()->hasPermission('Delete Users');
                                 @endif
                             </tr>
                         @endforeach
+                        <!-- Confirmation Modal -->
+                        <x-modal name="confirm-verify" :show="false" maxWidth="sm">
+                            <div class="p-6">
+                                <h2 class="text-lg font-semibold text-gray-900 dark:text-gray-100">{{ __('Are you sure you want to verify this user?') }}</h2>
+
+                                <div class="mt-4 flex justify-end">
+                                    <!-- Cancel Button -->
+                                    <x-secondary-button x-on:click="$dispatch('close-modal', { name: 'confirm-verify' })">
+                                        {{ __('Cancel') }}
+                                    </x-secondary-button>
+
+                                    <!-- Confirm Verify Button -->
+                                    <x-primary-button
+                                        wire:click="verify({{ $user->id }})"
+                                        class="ml-3"
+                                        x-on:click="$dispatch('close-modal', { name: 'confirm-verify' })">
+                                        {{ __('Confirm') }}
+                                    </x-primary-button>
+                                </div>
+                            </div>
+                        </x-modal>
                         <!-- Include Modal Component -->
                         <x-modal name="confirm-user-deletion">
                             <div class="p-6">
