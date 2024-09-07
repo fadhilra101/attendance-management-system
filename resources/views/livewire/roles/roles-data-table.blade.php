@@ -40,7 +40,7 @@ new class extends Component
         if (!Auth::user()->hasPermission('Delete Roles')) {
             abort(403, 'Unauthorized');
         }
-        
+
         // Hapus role setelah konfirmasi
         $role = Role::find($this->roleIdBeingDeleted);
 
