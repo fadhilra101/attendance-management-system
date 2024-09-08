@@ -47,6 +47,12 @@ new class extends Component
                         </x-nav-link>
                     @endif
 
+                    @if(Auth::user()->hasPermission('View Offices'))
+                        <x-nav-link :href="route('offices')" :active="request()->routeIs('offices')" wire:navigate>
+                            {{ __('Offices') }}
+                        </x-nav-link>
+                    @endif
+
                     @if(Auth::user()->hasPermission('View Permissions'))
                         <x-nav-link :href="route('permissions')" :active="request()->routeIs('permissions')" wire:navigate>
                             {{ __('Permissions') }}

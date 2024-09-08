@@ -33,6 +33,18 @@ Route::get('roles', function () {
     abort(403, 'Unauthorized');
 })->middleware(['auth'])->name('roles');
 
+Route::get('offices', function () {
+    $user = Auth::user();
+
+    // Check if the user is authenticated and has the permission 'view offices'
+    if ($user && $user->hasPermission('View Offices')) {
+        return view('offices');
+    }
+
+    // Abort with a 403 error if the user does not have access
+    abort(403, 'Unauthorized');
+})->middleware(['auth'])->name('offices');
+
 Route::get('permissions', function () {
     if (Auth::user() && Auth::user()->hasPermission('View Permissions')) {
         return view('permissions');

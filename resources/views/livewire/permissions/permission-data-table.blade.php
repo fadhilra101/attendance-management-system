@@ -178,46 +178,58 @@ new class extends Component
                         </tr>
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-200 dark:bg-gray-800 dark:divide-gray-700">
-                        @foreach(Permission::with('roles')->paginate(10) as $perm)
+                        @php
+                            $perms = Permission::with('roles')->paginate(10);
+                        @endphp
+
+                        @if($perms->count() > 0)
+                            @foreach($perms as $perm)
+                                <tr>
+                                    <td class="px-6 py-4 text-sm whitespace-nowrap">
+                                        {{ $perm->name }}
+                                    </td>
+                                    <td class="px-6 py-4 text-sm whitespace-nowrap">
+                                        {{ $perm->desc }}
+                                    </td>
+                                    @if($isAddRole)
+                                    <td class="px-6 py-4 text-sm whitespace-nowrap">
+                                        <div class="flex flex-wrap gap-6">
+                                            @foreach(Role::all() as $role)
+                                                <div class="flex flex-col items-center">
+                                                    <input
+                                                        type="checkbox"
+                                                        wire:model.defer="selectedRoles.{{ $perm->id }}.{{ $role->id }}"
+                                                        value="{{ $role->id }}"
+                                                        class="form-checkbox h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                                                    >
+                                                    <label class="text-sm font-thin text-gray-700 dark:text-gray-300">{{ $role->name }}</label>
+                                                </div>
+                                            @endforeach
+
+                                            <x-secondary-button
+                                                wire:click="edit('{{ $perm->id }}')">
+                                                {{ __('Edit') }}
+                                            </x-secondary-button>
+
+                                            <x-danger-button
+                                                wire:click="confirmDeletePerm({{ $perm->id }})"
+                                                x-data
+                                                x-on:click="$dispatch('open-modal', { name: 'confirm-perm-deletion' })"
+                                                class="ms-2">
+                                                {{ __('Delete') }}
+                                            </x-danger-button>
+                                        </div>
+                                    </td>
+                                    @endif
+                                </tr>
+                            @endforeach
+                        @else
                             <tr>
                                 <td class="px-6 py-4 text-sm whitespace-nowrap">
-                                    {{ $perm->name }}
+                                    {{ __('No permissions found.') }}
                                 </td>
-                                <td class="px-6 py-4 text-sm whitespace-nowrap">
-                                    {{ $perm->desc }}
-                                </td>
-                                @if($isAddRole)
-                                <td class="px-6 py-4 text-sm whitespace-nowrap">
-                                    <div class="flex flex-wrap gap-6">
-                                        @foreach(Role::all() as $role)
-                                            <div class="flex flex-col items-center">
-                                                <input
-                                                    type="checkbox"
-                                                    wire:model.defer="selectedRoles.{{ $perm->id }}.{{ $role->id }}"
-                                                    value="{{ $role->id }}"
-                                                    class="form-checkbox h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-                                                >
-                                                <label class="text-sm font-thin text-gray-700 dark:text-gray-300">{{ $role->name }}</label>
-                                            </div>
-                                        @endforeach
-
-                                        <x-secondary-button
-                                            wire:click="edit('{{ $perm->id }}')">
-                                            {{ __('Edit') }}
-                                        </x-secondary-button>
-
-                                        <x-danger-button
-                                            wire:click="confirmDeletePerm({{ $perm->id }})"
-                                            x-data
-                                            x-on:click="$dispatch('open-modal', { name: 'confirm-perm-deletion' })"
-                                            class="ms-2">
-                                            {{ __('Delete') }}
-                                        </x-danger-button>
-                                    </div>
-                                </td>
-                                @endif
                             </tr>
-                        @endforeach
+                        @endif
                         <!-- Include Modal Component -->
                         <x-modal name="confirm-perm-deletion">
                             <div class="p-6">

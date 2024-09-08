@@ -110,7 +110,12 @@ new class extends Component
                         </tr>
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-200 dark:bg-gray-800 dark:divide-gray-700">
-                        @foreach(Role::paginate(10) as $role)
+                        @php
+                            $roles = Role::paginate(10);
+                        @endphp
+
+                        @if($roles->count() > 0)
+                        @foreach($roles as $role)
                             <tr>
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     {{ $role->name }}
@@ -137,6 +142,13 @@ new class extends Component
                                 @endif
                             </tr>
                         @endforeach
+                        @else
+                            <tr>
+                                <td colspan="5" class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium text-gray-500 dark:text-gray-400">
+                                    {{ __('No Data Available') }}
+                                </td>
+                            </tr>
+                        @endif
                         <!-- Include Modal Component -->
                         <x-modal name="confirm-role-deletion">
                             <div class="p-6">

@@ -111,46 +111,56 @@ $userCanDelete = Auth::user()->hasPermission('Delete Users');
                         </tr>
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-200 dark:bg-gray-800 dark:divide-gray-700">
-                        @foreach(User::with('role')->paginate(10) as $user)
-                            <tr>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-100">{{ $user->name }}</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">{{ $user->email }}</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">{{ optional($user->role)->name ?? '-' }}</td>
-                                @if($user->role->name !== 'Super Admin')
-                                    @if($userCanEdit || $userCanDelete)
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                            @if($userCanEdit && $user->id !== Auth::user()->id)
-                                            <x-primary-button
-                                                :disabled="!is_null($user->verified_at)"
-                                                wire:click="$dispatch('open-modal', { name: 'confirm-verify', userId: {{ $user->id }} })">
-                                                {{ __('Verify') }}
-                                            </x-primary-button>
+                        @php
+                            $users = User::with('role')->paginate(10);
+                        @endphp
 
-                                                <x-secondary-button
-                                                    class="ms-2"
-                                                    wire:click="edit({{ $user->id }})">
-                                                    {{ __('Edit') }}
-                                                </x-secondary-button>
-                                            @endif
+                        @if($users->count() > 0)
+                            @foreach($users as $user)
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-100">{{ $user->name }}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">{{ $user->email }}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">{{ optional($user->role)->name ?? '-' }}</td>
+                                    @if($user->role->name !== 'Super Admin')
+                                        @if($userCanEdit || $userCanDelete)
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                                @if($userCanEdit && $user->id !== Auth::user()->id)
+                                                <x-primary-button
+                                                    :disabled="!is_null($user->verified_at)"
+                                                    wire:click="$dispatch('open-modal', { name: 'confirm-verify', userId: {{ $user->id }} })">
+                                                    {{ __('Verify') }}
+                                                </x-primary-button>
 
-                                            @if($userCanDelete && $user->id !== Auth::user()->id)
-                                                <x-danger-button
-                                                    x-on:click="$dispatch('open-modal', { name: 'confirm-user-deletion', userId: {{ $user->id }} })"
-                                                    class="ms-2">
-                                                    {{ __('Delete') }}
-                                                </x-danger-button>
-                                            @endif
-                                        </td>
+                                                    <x-secondary-button
+                                                        class="ms-2"
+                                                        wire:click="edit({{ $user->id }})">
+                                                        {{ __('Edit') }}
+                                                    </x-secondary-button>
+                                                @endif
+
+                                                @if($userCanDelete && $user->id !== Auth::user()->id)
+                                                    <x-danger-button
+                                                        x-on:click="$dispatch('open-modal', { name: 'confirm-user-deletion', userId: {{ $user->id }} })"
+                                                        class="ms-2">
+                                                        {{ __('Delete') }}
+                                                    </x-danger-button>
+                                                @endif
+                                            </td>
+                                        @endif
+                                    @elseif(!$userCanEdit && !$userCanDelete)
+
+                                    @else
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-100">
+                                        {{ __('Action not allowed') }}
+                                    </td>
                                     @endif
-                                @elseif(!$userCanEdit && !$userCanDelete)
-
-                                @else
-                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-100">
-                                    {{ __('Action not allowed') }}
-                                </td>
-                                @endif
+                                </tr>
+                            @endforeach
+                        @else
+                            <tr>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-100" colspan="4">{{ __('No users found') }}</td>
                             </tr>
-                        @endforeach
+                        @endif
                         <!-- Confirmation Modal -->
                         <x-modal name="confirm-verify" :show="false" maxWidth="sm">
                             <div class="p-6">
