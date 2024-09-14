@@ -23,7 +23,14 @@ new class extends Component {
         $this->email = $user->email;
         $this->role_id = $user->role_id;
 
-        $this->roles = Role::all()->pluck('name', 'id');
+        if (auth()->user()->role->name === 'Super Admin') {
+            // If the logged-in user is a Super Admin, retrieve all roles
+            $this->roles = Role::all()->pluck('name', 'id');
+        } else {
+            // If the logged-in user is not a Super Admin, retrieve all roles except 'Super Admin'
+            $this->roles = Role::where('name', '!=', 'Super Admin')->pluck('name', 'id');
+        }
+
     }
 
     public function update(): void

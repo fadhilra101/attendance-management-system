@@ -121,7 +121,7 @@ $userCanDelete = Auth::user()->hasPermission('Delete Users');
                                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-100">{{ $user->name }}</td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">{{ $user->email }}</td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">{{ optional($user->role)->name ?? '-' }}</td>
-                                    @if($user->role->name !== 'Super Admin')
+                                    @if(optional($user->role)->name !== 'Super Admin' || Auth::user()->hasRole('Super Admin'))
                                         @if($userCanEdit || $userCanDelete)
                                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                                 @if($userCanEdit && $user->id !== Auth::user()->id)
