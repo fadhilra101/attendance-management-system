@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\AttendanceController;
 
 Route::view('/', 'welcome');
 
@@ -54,10 +55,35 @@ Route::get('permissions', function () {
     abort(403, 'Unauthorized');
 })->middleware(['auth'])->name('permissions');
 
-Route::view('table1', 'table1')
-    ->middleware(['auth'])
-    ->name('table1');
+Route::get('attendances', function () {
+    if (Auth::user() && Auth::user()->hasPermission('View All Attendances')) {
+        return view('attendances');
+    }
 
+    abort(403, 'Unauthorized');
+})->middleware(['auth'])->name('attendances');
+
+Route::get('qr-code', function () {
+    if (Auth::user() && (Auth::user()->hasRole('Admin') || Auth::user()->hasRole('Super Admin'))) {
+        return view('qr-code');
+    }
+
+    abort(403, 'Unauthorized');
+})->middleware(['auth'])->name('qr-code');
+
+Route::middleware(['auth'])->group(function () {
+    Route::post('/attendances/scan', [AttendanceController::class, 'processScan'])->name('attendances.scan'); // Add POST route
+    Route::get('/attendances/scan', [AttendanceController::class, 'redirectToApi']); // Add GET route
+    Route::view('scan', 'scan')->name('scan');
+});
+
+Route::get('leave-requests', function () {
+    if (Auth::user() && Auth::user()->hasPermission('View Leave Requests')) {
+        return view('leave-requests');
+    }
+
+    abort(403, 'Unauthorized');
+})->middleware(['auth'])->name('leave-requests');
 
 Route::view('profile', 'profile')
     ->middleware(['auth'])

@@ -3,8 +3,7 @@
 use App\Models\Office;
 use Livewire\Volt\Component;
 
-new class extends Component
-{
+new class extends Component {
     public $officeId, $name, $address, $gps_lat, $gps_lng;
 
     public function mount($officeId): void
@@ -25,30 +24,13 @@ new class extends Component
         }
 
         $this->validate([
-            'name' => [
-                'required',
-                'string',
-                'max:255',
-            ],
+            'name' => ['required', 'string', 'max:255'],
 
-            'address' => [
-                'required',
-                'string',
-                'max:255',
-            ],
+            'address' => ['required', 'string', 'max:255'],
 
-            'gps_lat' => [
-                'required',
-                'string',
-                'max:255',
-            ],
+            'gps_lat' => ['required', 'string', 'max:255'],
 
-            'gps_lng' => [
-                'required',
-                'string',
-                'max:255',
-            ],
-
+            'gps_lng' => ['required', 'string', 'max:255'],
         ]);
 
         $office = Office::findOrFail($this->officeId);
@@ -70,7 +52,7 @@ new class extends Component
         $this->reset(['officeId', 'name', 'address', 'gps_lat', 'gps_lng']);
         $this->dispatch('hideEdit');
     }
-}
+};
 ?>
 
 <form wire:submit="update" class="space-y-4 w-full">
@@ -98,10 +80,7 @@ new class extends Component
         <x-input-error :messages="$errors->get('gps_lng')" class="mt-2" />
     </div>
 
-    <x-blue-button
-        type="button"
-        wire:click="getGPS"
-        class="mb-2">
+    <x-blue-button type="button" wire:click="getGPS" class="mb-2">
         {{ __('Get GPS ') }}
     </x-blue-button>
 
@@ -109,3 +88,4 @@ new class extends Component
         <x-primary-button type="submit">{{ __('Update') }}</x-primary-button>
         <x-secondary-button type="button" wire:click="$dispatch('hideEdit')">{{ __('Cancel') }}</x-secondary-button>
     </div>
+</form>

@@ -11,4 +11,10 @@ export default defineConfig({
             refresh: true,
         }),
     ],
+    server: {
+        cors: true,
+        headers: {
+            'Access-Control-Allow-Origin': '*'
+        }
+    }
 });

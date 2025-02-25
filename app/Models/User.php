@@ -22,7 +22,8 @@ class User extends Authenticatable
         'email',
         'password',
         'verified_at',
-        'role_id'
+        'role_id',
+        'face_embeddings',
     ];
 
     /**
@@ -56,8 +57,6 @@ class User extends Authenticatable
         return $this->role && $this->role->name === $role;
     }
 
-
-
     // Check if the user has a specific permission by permission name
     public function hasPermission($permissionName)
     {
@@ -74,6 +73,7 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'face_embeddings' => 'array',
         ];
     }
 }
